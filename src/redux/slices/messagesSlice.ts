@@ -2,24 +2,28 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 export interface MessagesState {
-  messages: string[]
+  messages: string[] | null
 }
 
 const initialState: MessagesState = {
-  messages: [],
+  messages: null,
 }
 
 export const messagesSlice = createSlice({
   name: 'messages',
   initialState,
   reducers: {
+    addMessages: (state, action: PayloadAction<string[]>) => {
+      state.messages = action.payload;
+    },
     addMessage: (state, action: PayloadAction<string>) => {
-      state.messages.push(action.payload)
+      if (state.messages === null) return;
+      state.messages.push(action.payload);
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { addMessage } = messagesSlice.actions
+export const { addMessages, addMessage } = messagesSlice.actions
 
 export default messagesSlice.reducer

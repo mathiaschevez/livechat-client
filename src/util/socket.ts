@@ -1,4 +1,5 @@
 import { io } from "socket.io-client";
+import { fetchMessages } from "../api/messages";
 
 const socket = io("http://localhost:8000", {
   transports: ['websocket'],
@@ -7,6 +8,7 @@ const socket = io("http://localhost:8000", {
 
 socket.on("connect", () => {
   console.log('user connected');
+  fetchMessages();
 });
 
 socket.on("connect_error", (err) => {
