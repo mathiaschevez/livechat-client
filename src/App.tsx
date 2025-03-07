@@ -11,26 +11,34 @@ export default function App() {
   const [newMessage, setNewMessage] = useState('')
 
   async function createMessage(message: string) {
-    socket.emit('chat message', message);
+    setNewMessage('');
+    socket.emit('chatMessage', message);
   }
 
   useEffect(() => {
     // Listen for real-time messages
-    socket.on("chat message", (message) => {
+    socket.on("chatMessage", (message) => {
       dispatch(addMessage(message));
     });
 
     return () => {
-      socket.off("chat message");
+      socket.off("chatMessage");
     };
   }, [dispatch]);
 
   return (
-    <div>
-      <h2>Live Chat</h2>
-      {messages === null ? "Loading" : <div>
-        <input type='text' value={newMessage} onChange={e => setNewMessage(e.currentTarget.value)}/>
-        <button onClick={() => createMessage(newMessage)}>Send Message</button>
+    <div className='flex flex-col w-full gap-6'>
+      <div className='text-2xl font-bold'>Live Chat</div>
+      {messages === null ? "Loading" : <div className='flex flex-col gap-6 w-full'>
+        <div className='flex gap-3 w-full'>
+          <input
+            className='border border-black dark:border-white flex-1 px-2'
+            type='text'
+            value={newMessage}
+            onChange={e => setNewMessage(e.currentTarget.value)}
+          />
+          <button onClick={() => createMessage(newMessage)}>Send Message</button>
+        </div>
         <ul>
           {messages.map((msg, index) => (
             <li key={index}>{msg}</li>
