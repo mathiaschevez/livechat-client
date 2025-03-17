@@ -11,12 +11,13 @@ export default function App() {
   const [newMessage, setNewMessage] = useState('')
 
   async function createMessage(message: string) {
-    setNewMessage('');
-    socket.emit('chatMessage', message);
+    if (message.length > 0) {
+      setNewMessage('');
+      socket.emit('chatMessage', message);
+    } else return;
   }
 
   useEffect(() => {
-    // Listen for real-time messages
     socket.on("chatMessage", (message) => {
       dispatch(addMessage(message));
     });
@@ -27,24 +28,36 @@ export default function App() {
   }, [dispatch]);
 
   return (
-    <div className='flex flex-col w-full gap-6'>
-      <div className='text-2xl font-bold'>Live Chat</div>
-      {messages === null ? "Loading" : <div className='flex flex-col gap-6 w-full'>
-        <div className='flex gap-3 w-full'>
-          <input
-            className='border border-black dark:border-white flex-1 px-2'
-            type='text'
-            value={newMessage}
-            onChange={e => setNewMessage(e.currentTarget.value)}
-          />
-          <button onClick={() => createMessage(newMessage)}>Send Message</button>
+    <div className='h-screen flex flex-col p-4 gap-2'>
+      <div className='text-2xl font-bold text-center'>Live Chat</div>
+      {messages === null ? ("Loading") : (
+        <div className='flex-1 flex flex-col gap-2 min-h-0'>
+          <ul className='flex-1 overflow-y-auto flex flex-col gap-1 min-h-0'>
+            {messages.map((msg, index) => (
+              <li key={index} className='text-left font-bold'>
+                {msg}
+              </li>
+            ))}
+          </ul>
+          <div className='flex gap-3 w-full'>
+            <input
+              className='border border-black dark:border-white flex-1 px-2'
+              type='text'
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") createMessage(newMessage);
+              }}
+            />
+            <button
+              disabled={!(newMessage.length > 0)}
+              onClick={() => createMessage(newMessage)}
+            >
+              Send Message
+            </button>
+          </div>
         </div>
-        <ul>
-          {messages.map((msg, index) => (
-            <li key={index}>{msg}</li>
-          ))}
-        </ul>
-      </div>}
+      )}
     </div>
   );
 }
